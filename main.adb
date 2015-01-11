@@ -2,26 +2,37 @@ with Ada.Text_IO, CarPkg;
 use Ada.Text_IO, CarPkg;
 
 procedure Main is
+
+  CAR_NUM : constant Integer := 10;
+
   task type Pump is 
     entry start;
-    entry tank(V : Integer);
+    entry tank(vol : in out Integer);
     entry getCapacity(cap : out Integer);
     entry stop;
   end Pump;
 
   task body Pump is
     capacity : Integer := 500;
-    isBusy : Integer := 0;
+    isBusy : Boolean  := False;
   begin
     accept start do
       put_line("dupa");
     end start;
     loop
       select
-        when capacity > 0 =>
-          accept tank(V : Integer) do
+        when capacity > 0 and isBusy = False =>
+          accept tank(vol : in out Integer) do
+            isBusy := True;
             put_line("tank");
-            capacity := capacity - V;
+            delay Duration(2.0);
+            if capacity < vol then
+              vol := capacity;
+              capacity := 0;
+            else
+              capacity := capacity - vol;
+            end if;
+            isBusy := False;
           end tank;
       or
         accept getCapacity(cap : out Integer) do
@@ -35,15 +46,26 @@ procedure Main is
     end loop;
   end Pump;
 
-  FuelPump : Pump;
+  fuelPump : Pump;
   currentCapacity : Integer := 500;
+  cars : array (1..CAR_NUM) of Car;
+  toTank : Integer := 200;
 begin
-  delay Duration(1.0);
-  FuelPump.start;
-  delay Duration(1.0);
-  FuelPump.tank(200);
-  delay Duration(1.0);
-  FuelPump.getCapacity(currentCapacity);
-  put_line(currentCapacity'Img);
-  FuelPump.stop;
+  for i in Integer range 1..CAR_NUM loop
+    cars(i).start(i);
+  end loop;
+  fuelPump.start;
+
+  --fuelPump.tank(toTank);
+  --fuelPump.tank(toTank);
+  --fuelPump.tank(toTank);
+  --put_line(toTank'Img);
+  --fuelPump.getCapacity(currentCapacity);
+  --put_line(currentCapacity'Img);
+  --fuelPump.stop;
+
+  for i in Integer range 1..CAR_NUM loop
+    cars(i).stop;
+  end loop;
+  fuelPump.stop;
 end Main;
