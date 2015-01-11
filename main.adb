@@ -47,7 +47,8 @@ procedure Main is
   end Pump;
 
   fuelPump : Pump;
-  currentCapacity : Integer := 500;
+  maxCapacity : Integer := 100000;
+  currentCapacity : Integer := 100000;
   cars : array (1..CAR_NUM) of Car;
   toTank : Integer := 200;
 begin
