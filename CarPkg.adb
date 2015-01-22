@@ -19,15 +19,17 @@ package body CarPkg is
 
   begin
     accept start(id : Integer) do
-      Rand_Int_Time.Reset(timeSeed);
-      startTime := Rand_Int_Time.Random(timeSeed);
-      Rand_Int_Fuel.Reset(fuelSeed);
-      fuel := Rand_Int_Fuel.Random(fuelSeed);
-      Rand_Int_Gas_Tank.Reset(gasTankSeed);
-      gasTankCapacity := Rand_Int_Gas_Tank.Random(gasTankSeed);
       carId := id;
-      put_line(id'Img & ". car will start at" & startTime'Img & "min and has" & fuel'Img & "l of fuel, max fuel:" & gasTankCapacity'Img & "l");
     end start;
+
+    Rand_Int_Time.Reset(timeSeed);
+    startTime := Rand_Int_Time.Random(timeSeed);
+    Rand_Int_Fuel.Reset(fuelSeed);
+    fuel := Rand_Int_Fuel.Random(fuelSeed);
+    Rand_Int_Gas_Tank.Reset(gasTankSeed);
+    gasTankCapacity := Rand_Int_Gas_Tank.Random(gasTankSeed);
+    put_line(carId'Img & ". car will start at" & startTime'Img & "s and has" & fuel'Img & "l of fuel, max fuel:" & gasTankCapacity'Img & "l");
+  
     delay Duration(startTime);
     put_line("car" & carId'Img & " started");
     loop
