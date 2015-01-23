@@ -1,5 +1,5 @@
-with Ada.Text_IO, Ada.Numerics.Discrete_Random;
-use Ada.Text_IO;
+with Ada.Text_IO, Ada.Numerics.Discrete_Random, pump;
+use Ada.Text_IO,pump;
 
 package body CarPkg is
   task body Car is
@@ -14,14 +14,18 @@ package body CarPkg is
   gasTankSeed : Rand_Int_Gas_Tank.Generator;
   startTime : Start_Time_Range;
   fuel : Fuel_Range;
+  fuelInt : Integer := Integer'Value(fuel'Img);
   gasTankCapacity : Gas_Tank_Range;
   carId : Integer := 0;
-
+  type Pump_ptr is access all PumpO;
+  pp : Pump_ptr;
   begin
-    accept start(id : Integer) do
+    accept start(id : Integer;p : in out PumpO) do
       carId := id;
+	  put_line("car" & carId'Img & " is trying to tank");
+	 -- pp :=  p'Access;
     end start;
-
+ --p.tank(fuelInt);
     Rand_Int_Time.Reset(timeSeed);
     startTime := Rand_Int_Time.Random(timeSeed);
     Rand_Int_Fuel.Reset(fuelSeed);
@@ -32,6 +36,9 @@ package body CarPkg is
   
     delay Duration(startTime);
     put_line("car" & carId'Img & " started");
+	delay Duration(3);
+	put_line("Car" & carId'Img & " arrived at Gas Stations");
+	
     loop
       select
         accept stop;
