@@ -44,9 +44,9 @@ package body CarPkg is
     put_line("car" & carId'Img & " started");
 	put_line("Car" & carId'Img & " arrived at Gas Stations");
 	StartTank := Clock;
-	pp.tank(ToTank);
-	EndTank := Clock;
-	elapsed := EndTank - StartTank;
+	pp.tank(ToTank,EndTank);
+	--EndTank := Clock;
+	elapsed := EndTank - StartTank;-- - Duration(2.0);
 	put_line("Car " & carId'Img & " has been waiting " &  To_Duration(elapsed)'Img & " minutes");
 	
     loop

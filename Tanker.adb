@@ -18,9 +18,9 @@ task body tankerO is
 				put_line("tanker arrived");
 				delay(1.0);
 				if(MaxC <= c + Fuel) then
-					c := c + Fuel;
-				else 
 					c := MaxC;
+				else 
+					c := c + Fuel;
 				end if;
 				
 			end FillTanks;
