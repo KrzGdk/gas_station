@@ -2,19 +2,32 @@
   use Ada.Text_IO,pump;
   
 package body Tanker is
-task body tanker is
+task body tankerO is
 	Capacity : Integer :=0;
 	Fuel : Integer := 300;
 	begin
-		accept start(p : in out PumpO) do
-			loop
-				 p.getCapacity(Capacity);
-				 if(Capacity = 0) then
-					delay(2.0); --czas dojazdu na stację
-					p.FillTanks(Fuel);					
-					end if;
+	loop
+		select
+			accept start do
+				put_line("tanker");
+			end start;
+		or
+			accept FillTanks(c : in out Integer; MaxC : in Integer) do
+				put_line("Fuel ran out, waiting for tanker");
+				delay(2.0);
+				put_line("tanker arrived");
 				delay(1.0);
-			end loop;
-		end start;
-	end tanker;
+				if(MaxC <= c + Fuel) then
+					c := c + Fuel;
+				else 
+					c := MaxC;
+				end if;
+				
+			end FillTanks;
+		or
+			accept stop;
+			exit;
+		end select;
+	end loop;
+	end tankerO;
 end Tanker;

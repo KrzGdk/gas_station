@@ -1,5 +1,5 @@
-with Ada.Text_IO, Ada.Numerics.Discrete_Random, pump;
-use Ada.Text_IO,pump;
+with Ada.Text_IO, Ada.Numerics.Discrete_Random, pump, Ada.Real_Time;
+use Ada.Text_IO,pump,Ada.Real_Time;
 
 package body CarPkg is
   task body Car is
@@ -13,17 +13,21 @@ package body CarPkg is
   package Rand_Int_Gas_Tank is new Ada.Numerics.Discrete_Random(Gas_Tank_Range);
   gasTankSeed : Rand_Int_Gas_Tank.Generator;
   startTime : Start_Time_Range;
+  StartTank : Time;
+  elapsed : Time_Span;
+  EndTank : Time;
   fuel : Fuel_Range;
   fuelInt : Integer := Integer'Value(fuel'Img);
   gasTankCapacity : Gas_Tank_Range;
   carId : Integer := 0;
+  ToTank : Integer;
   type Pump_ptr is access all PumpO;
   pp : Pump_ptr;
   begin
-    accept start(id : Integer;p : in out PumpO) do
+    accept start(id : Integer;p : aliased  in out PumpO) do
       carId := id;
 	  put_line("car" & carId'Img & " is trying to tank");
-	 -- pp :=  p'Access;
+	  pp :=  p'Access;
     end start;
  --p.tank(fuelInt);
     Rand_Int_Time.Reset(timeSeed);
@@ -32,12 +36,18 @@ package body CarPkg is
     fuel := Rand_Int_Fuel.Random(fuelSeed);
     Rand_Int_Gas_Tank.Reset(gasTankSeed);
     gasTankCapacity := Rand_Int_Gas_Tank.Random(gasTankSeed);
-    put_line(carId'Img & ". car will start at" & startTime'Img & "s and has" & fuel'Img & "l of fuel, max fuel:" & gasTankCapacity'Img & "l");
+    ToTank := Integer'Value(gasTankCapacity'Img) - Integer'Value(fuel'Img); -- żeby zatankować do pełna
+	
+	put_line(carId'Img & ". car will start at" & startTime'Img & "s and has" & fuel'Img & "l of fuel, max fuel:" & gasTankCapacity'Img & "l");
   
     delay Duration(startTime);
     put_line("car" & carId'Img & " started");
-	delay Duration(3);
 	put_line("Car" & carId'Img & " arrived at Gas Stations");
+	StartTank := Clock;
+	pp.tank(ToTank);
+	EndTank := Clock;
+	elapsed := EndTank - StartTank;
+	put_line("Car " & carId'Img & " has been waiting " &  To_Duration(elapsed)'Img & " minutes");
 	
     loop
       select

@@ -2,8 +2,9 @@ with pump;
 use pump;
 
 package Tanker is
-  task type tanker is 
-    entry start(p : in out PumpO);
-    --entry stop;
+  task type tankerO is 
+    entry start;
+	entry FillTanks(c : in out Integer; MaxC : in Integer);
+    entry stop;
   end ;
 end Tanker;

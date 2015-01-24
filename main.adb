@@ -4,7 +4,6 @@ use Ada.Text_IO, CarPkg, pump,Tanker;
 procedure Main is
 
   CAR_NUM : constant Integer := 10;
-
   fuelPump : aliased  PumpO;
   maxCapacity : Integer := 100000;
   currentCapacity : Integer := 100000;
@@ -15,7 +14,6 @@ fuelPump.start;
   for i in Integer range 1..CAR_NUM loop
     cars(i).start(i,fuelPump);
   end loop;
-   
 
   --fuelPump.tank(toTank);
   --fuelPump.tank(toTank);
