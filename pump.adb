@@ -1,11 +1,13 @@
-  with Ada.Text_IO, Ada.Numerics.Discrete_Random;
-  use Ada.Text_IO;
+  with Ada.Text_IO, Ada.Numerics.Discrete_Random, Tanker;
+  use Ada.Text_IO, Tanker;
   
   
   package body pump is
   
   task body PumpO is
-    capacity : Integer := 500;
+    tanker  : tankerO; 
+    capacity : Integer := 100;
+	MaxCapacity : Integer :=capacity;
     isBusy : Boolean  := False;
 	CashRegister : Integer :=0; --Piwowarczyk mówił o takich bajerach jak opróżnianie kasy każdego dnia, robimy to?
     income : Integer := 0;
@@ -13,6 +15,7 @@
 	FuelPrice2 : Integer := 3;
   begin
     accept start do
+	tanker.start;
       put_line("dupa");
     end start;
     loop
@@ -20,15 +23,17 @@
         when capacity > 0 and isBusy = False =>
           accept tank(vol : in out Integer) do
 		    isBusy := True;
-            put_line("tank");
             delay Duration(2.0);
             if capacity < vol then
               vol := capacity;
 			  CashRegister := CashRegister + vol* FuelPrice;
+			  income := income + vol* FuelPrice;
               capacity := 0;
+			  tanker.FillTanks(capacity,MaxCapacity);
             else
               capacity := capacity - vol;
 			  CashRegister := CashRegister + vol* FuelPrice;
+			  income := income + vol* FuelPrice;
             end if;
 			isBusy := False;
           end tank;
@@ -46,6 +51,8 @@
 			end FillTanks;
 	  or
         accept stop;
+		tanker.stop;
+		   put_line("cash = " & CashRegister 'Img & " income = "  & income'Img);
         exit;
 		
       end select;
