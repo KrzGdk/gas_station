@@ -7,16 +7,11 @@ task body tankerO is
 	Fuel : Integer := 300;
 	begin
 	loop
-		select
-			accept start do
-				put_line("tanker");
-			end start;
-		or
+	select
 			accept FillTanks(c : in out Integer; MaxC : in Integer) do
 				put_line("Fuel ran out, waiting for tanker");
 				delay(2.0);
 				put_line("tanker arrived");
-				delay(1.0);
 				if(MaxC <= c + Fuel) then
 					c := MaxC;
 				else 

@@ -3,7 +3,6 @@ use pump;
 
 package Tanker is
   task type tankerO is 
-    entry start;
 	entry FillTanks(c : in out Integer; MaxC : in Integer);
     entry stop;
   end ;

@@ -3,9 +3,7 @@ use Ada.Real_Time;
 
 package pump is
   task type PumpO is 
-    entry start;
-    entry tank(vol : in out Integer;EndTank : in out Time);
-    entry getCapacity(cap : out Integer);
+    entry tank(queue : in out Integer;EndTank : out Time);
     entry stop;
   end ;
 end pump;
