@@ -1,25 +1,31 @@
 --STATYSTYKI:
---max kolejka
 --dzienne wpływy
---liczba samochodów nie obsłużonych
---kilka pomp
 --opróżnianie kasy
 
 
-with Ada.Text_IO, CarPkg, pump,Tanker,GasStation;
-use Ada.Text_IO, CarPkg, pump,Tanker,GasStation;
+with Ada.Text_IO, CarPkg, pump,Tanker,GasStation,Days,Ada.Integer_Text_io;
+use Ada.Text_IO, CarPkg, pump,Tanker,GasStation,Days,Ada.Integer_Text_io;
 
 procedure Main is
-
-  CAR_NUM : constant Integer := 10;
+  days : Day;
+  CAR_NUM :  Integer := 20;
   gasStation : aliased Gas_Station;
-  cars : array (1..CAR_NUM) of Car;
+   type cars is array(Integer range <>) of Car;
 begin
+	put_line("Number of cars: ");
+	get(CAR_NUM);
+	declare
+       cars : array (1..CAR_NUM) of Car;
+   begin
+   
   for i in Integer range 1..CAR_NUM loop
     cars(i).start(i,gasStation);
   end loop;
+  days.start(gasStation);
   for i in Integer range 1..CAR_NUM loop
     cars(i).stop;
   end loop;
+  days.stop;
   gasStation.stop;
+  end;
 end Main;

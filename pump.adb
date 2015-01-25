@@ -9,14 +9,14 @@
    accept tank(queue : in out Integer;EndTank :  out Time) do
       EndTank := Clock;
       delay Duration(5.0);
-      queue:=queue-1; --dzieją się dziwne rzeczy po odkomentowaniu
+      queue:=queue-1; 
     end tank;    
     loop
 	    select
 	      accept tank(queue : in out Integer;EndTank :  out Time) do
 			    EndTank := Clock;
 			    delay Duration(5.0);
-			    queue:=queue-1; --dzieją się dziwne rzeczy po odkomentowaniu
+			    queue:=queue-1;
         end tank;
 		  or
         accept stop;

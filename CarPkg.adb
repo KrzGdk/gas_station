@@ -3,7 +3,7 @@ use Ada.Text_IO,GasStation,Ada.Real_Time, pump;
 
 package body CarPkg is
   task body Car is
-  type Start_Time_Range is range 0..10;
+  type Start_Time_Range is range 0..50;
   type Fuel_Range is range 0..30;
   type Gas_Tank_Range is range 45..80;
   package Rand_Int_Time is new Ada.Numerics.Discrete_Random(Start_Time_Range);
@@ -45,14 +45,19 @@ package body CarPkg is
 	StartTank := Clock;
 	--pp.tank(ToTank);
   pp.selectDistributor(ToTank,choosenPump);
-  choosenPump.pump.tank(ToTank,EndTank);
+  if(ToTank > 0) then
+	choosenPump.pump.tank(choosenPump.queue,EndTank);
 	elapsed := EndTank - StartTank;-- - Duration(2.0);
 	put_line("Car " & carId'Img & " has been waiting " &  To_Duration(elapsed)'Img & " minutes");
+	else
+	put_line("odpadam " & carId'Img);
+  end if;
+	
 	
     loop
       select
         accept stop;
-        put_line("car" & carId'Img & " stopped");
+        --put_line("car" & carId'Img & " stopped");
         exit;
       end select;
     end loop;
