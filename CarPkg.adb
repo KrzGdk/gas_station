@@ -13,8 +13,6 @@ package body CarPkg is
   package Rand_Int_Gas_Tank is new Ada.Numerics.Discrete_Random(Gas_Tank_Range);
   gasTankSeed : Rand_Int_Gas_Tank.Generator;
   startTime : Start_Time_Range;
-  StartTank : Time;
-  elapsed : Time_Span;
   EndTank : Time;
   fuel : Fuel_Range;
   fuelInt : Integer := Integer'Value(fuel'Img);
@@ -41,16 +39,12 @@ package body CarPkg is
   
     delay Duration(startTime);
     put_line("car" & carId'Img & " started");
-	--put_line("Car" & carId'Img & " arrived at Gas Stations");
-	StartTank := Clock;
-	--pp.tank(ToTank);
   pp.selectDistributor(ToTank,choosenPump);
   if(ToTank > 0) then
 	choosenPump.pump.tank(choosenPump.queue,EndTank);
-	elapsed := EndTank - StartTank;-- - Duration(2.0);
-	put_line("Car " & carId'Img & " has been waiting " &  To_Duration(elapsed)'Img & " minutes");
+	
 	else
-	put_line("odpadam " & carId'Img);
+	put_line("Queue too long, car" & carId'Img & " passing by");
   end if;
 	
 	
