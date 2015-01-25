@@ -1,5 +1,5 @@
-with Ada.Text_IO, Ada.Numerics.Discrete_Random, GasStation, Ada.Real_Time;
-use Ada.Text_IO,GasStation,Ada.Real_Time;
+with Ada.Text_IO, Ada.Numerics.Discrete_Random, GasStation, Ada.Real_Time, pump;
+use Ada.Text_IO,GasStation,Ada.Real_Time, pump;
 
 package body CarPkg is
   task body Car is
@@ -21,12 +21,12 @@ package body CarPkg is
   gasTankCapacity : Gas_Tank_Range;
   carId : Integer := 0;
   ToTank : Integer;
+  choosenPump : Distributor_ptr;
   type GasStation_ptr is access all Gas_Station;
   pp : GasStation_ptr;
   begin
     accept start(id : Integer;p : aliased  in out Gas_Station) do
       carId := id;
-	  put_line("car" & carId'Img & " is trying to tank");
 	  pp :=  p'Access;
     end start;
     Rand_Int_Time.Reset(timeSeed);
@@ -43,7 +43,9 @@ package body CarPkg is
     put_line("car" & carId'Img & " started");
 	--put_line("Car" & carId'Img & " arrived at Gas Stations");
 	StartTank := Clock;
-	pp.tank(ToTank,EndTank);
+	--pp.tank(ToTank);
+  pp.selectDistributor(ToTank,choosenPump);
+  choosenPump.pump.tank(ToTank,EndTank);
 	elapsed := EndTank - StartTank;-- - Duration(2.0);
 	put_line("Car " & carId'Img & " has been waiting " &  To_Duration(elapsed)'Img & " minutes");
 	

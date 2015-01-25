@@ -8,17 +8,17 @@ task body tankerO is
 	begin
 	loop
 	select
-			accept FillTanks(c : in out Integer; MaxC : in Integer) do
-				put_line("Fuel ran out, waiting for tanker");
-				delay(2.0);
-				put_line("tanker arrived");
-				if(MaxC <= c + Fuel) then
-					c := MaxC;
-				else 
-					c := c + Fuel;
-				end if;
-				
-			end FillTanks;
+		accept FillTanks(c : in out Integer; MaxC : in Integer) do
+			put_line("Fuel ran out, waiting for tanker");
+			delay(2.0);
+			put_line("tanker arrived");
+			if(MaxC <= c + Fuel) then
+				c := MaxC;
+			else 
+				c := c + Fuel;
+			end if;
+			
+		end FillTanks;
 		or
 			accept stop;
 			exit;

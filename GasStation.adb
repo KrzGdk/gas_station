@@ -14,11 +14,7 @@ task body Gas_Station is
 	   loss : Integer;
     end record;
 	
-	type Distributor is
-	record
-		pump :PumpO;
-		queue : Integer :=0;				--kolejka do dystrybutora
-	end record;
+	
 	
 	tanker  : tankerO; 				   	--cysterna
 	capacity : Integer := 10000; 		   	--ilość paliwa w zbiornikach
@@ -33,19 +29,16 @@ task body Gas_Station is
 	daysCount : Integer :=1;			--licznik dni
 	MaxQueue : Integer :=5;				--najdłuższa dopuszczalna kolejka
 	longestQueue : Integer :=0;			--najdłuższa zarejestrowana kolejka
-	DistributorsNumber : Integer :=20;	--liczba dystrybutorów
-	Distributors : array (1..DistributorsNumber) of Distributor;
+	DistributorsNumber : Integer :=3;	--liczba dystrybutorów
+	Distributors : array (1..DistributorsNumber) of aliased Distributor;
 	AllStats : array (1..MaxDay) of Stats; --codzienne statystyki
 	FuelPrice : Integer := 5; 		   	--cena sprzedaży paliwa
 	FuelPrice2 : Integer := 3; 		   	--cena zakupu paliwa
 	lowestQueue : Integer:=MaxQueue+1;	--najmniejsza kolejka do dystrybutora
 	index : Integer:=0;					--index najmniejszej kolejki
 	index2 : Integer:=0;					--index najmniejszej kolejki
-
-begin	
-
-	accept tank(vol : in out Integer;EndTank : out Time) do
-			put_line("Car  arrived at Gas Stations " & DistributorsNumber'Img);
+begin
+	accept selectDistributor(vol : in out Integer; selectedPump : out Distributor_ptr) do
 		for i in Integer range 1..DistributorsNumber loop
 			if(Distributors(i).queue < lowestQueue) then
 				lowestQueue := Distributors(i).queue;
@@ -54,7 +47,7 @@ begin
 			if(Distributors(i).queue > longestQueue) then
 				longestQueue := Distributors(i).queue; 
 			end if;
-			put_line("lowestQueue: " & lowestQueue'Img & " queue: " & Distributors(i).queue'Img & " i=" & i'Img);
+			--put_line("lowestQueue: " & lowestQueue'Img & " queue: " & Distributors(i).queue'Img & " i=" & i'Img);
 		end loop;
 		lowestQueue :=99;
 		put_line("chosen distributor: " & index'Img & " queue: " & Distributors(index).queue'Img);
@@ -68,7 +61,7 @@ begin
 				notServisedCars := notServisedCars+1;
 			end if;
 		else
-			Distributors(index).pump.tank(Distributors(index).queue,EndTank);
+			selectedPump := Distributors(index)'Unrestricted_Access;
 			if capacity < vol then
 			  vol := capacity;
 			  CashRegister := CashRegister + vol* FuelPrice;
@@ -83,49 +76,48 @@ begin
 			  income := income + vol* FuelPrice;
 			end if;
 		end if;
-	end tank;
+	end selectDistributor;
 	loop
 		select
-	accept tank(vol : in out Integer;EndTank : out Time) do
-			put_line("Car  arrived at Gas Stations " & DistributorsNumber'Img);
-		for i in Integer range 1..DistributorsNumber loop
-			if(Distributors(i).queue < lowestQueue) then
-				lowestQueue := Distributors(i).queue;
-				index := i;
-			end if;
-			if(Distributors(i).queue > longestQueue) then
-				longestQueue := Distributors(i).queue; 
-			end if;
-			put_line("lowestQueue: " & lowestQueue'Img & " queue: " & Distributors(i).queue'Img & " i=" & i'Img);
-		end loop;
-		lowestQueue :=99;
-		put_line("chosen distributor: " & index'Img & " queue: " & Distributors(index).queue'Img);
-		Distributors(index).queue := Distributors(index).queue + 1;
-		if(lowestQueue = MaxQueue) then
-			if capacity < vol then
-				loss := loss + capacity*(FuelPrice-FuelPrice2);
-				notServisedCars := notServisedCars+1;
-			else
-				loss := loss + vol*(FuelPrice-FuelPrice2);
-				notServisedCars := notServisedCars+1;
-			end if;
-		else
-			Distributors(index).pump.tank(Distributors(index).queue,EndTank);
-			if capacity < vol then
-			  vol := capacity;
-			  CashRegister := CashRegister + vol* FuelPrice;
-			  income := income + vol* FuelPrice;
-			  capacity := 0;
-			  tanker.FillTanks(capacity,MaxCapacity);
-			  delay(3.0);
-			  income := income - capacity * FuelPrice2;
-			else
-			  capacity := capacity - vol;
-			  CashRegister := CashRegister + vol* FuelPrice;
-			  income := income + vol* FuelPrice;
-			end if;
-		end if;
-	end tank;
+			accept selectDistributor(vol : in out Integer;selectedPump : out Distributor_ptr) do
+				for i in Integer range 1..DistributorsNumber loop
+					if(Distributors(i).queue < lowestQueue) then
+						lowestQueue := Distributors(i).queue;
+						index := i;
+					end if;
+					if(Distributors(i).queue > longestQueue) then
+						longestQueue := Distributors(i).queue; 
+					end if;
+					--put_line("lowestQueue: " & lowestQueue'Img & " queue: " & Distributors(i).queue'Img & " i=" & i'Img);
+				end loop;
+				lowestQueue :=99;
+				put_line("chosen distributor: " & index'Img & " queue: " & Distributors(index).queue'Img);
+				Distributors(index).queue := Distributors(index).queue + 1;
+				if(lowestQueue = MaxQueue) then
+					if capacity < vol then
+						loss := loss + capacity*(FuelPrice-FuelPrice2);
+						notServisedCars := notServisedCars+1;
+					else
+						loss := loss + vol*(FuelPrice-FuelPrice2);
+						notServisedCars := notServisedCars+1;
+					end if;
+				else
+					selectedPump := Distributors(index)'Unrestricted_Access;
+					if capacity < vol then
+					  vol := capacity;
+					  CashRegister := CashRegister + vol* FuelPrice;
+					  income := income + vol* FuelPrice;
+					  capacity := 0;
+					  tanker.FillTanks(capacity,MaxCapacity);
+					  delay(3.0);
+					  income := income - capacity * FuelPrice2;
+					else
+					  capacity := capacity - vol;
+					  CashRegister := CashRegister + vol* FuelPrice;
+					  income := income + vol* FuelPrice;
+					end if;
+				end if;
+			end selectDistributor;
 			or
 			accept EndOfDay do
 			put_line("station starts");
@@ -140,7 +132,7 @@ begin
 			tanker.stop;
 			for i in Integer range 1..DistributorsNumber loop
 				Distributors(i).pump.stop;
-			 end loop;
+			end loop;
 			exit;
 		end select;
 	end loop;
